@@ -56,7 +56,7 @@ REM 1. train AE
 REM python main.py --arch=ae --z_num=16 --max_epoch=10 --filter=64 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128
 
 REM 2. generate latent code set
-REM python main.py --is_train=False --load_path=AE_MODEL_DIR --arch=ae --z_num=16 --max_epoch=20 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128
+REM python main.py --is_train=False --load_path=AE_MODEL_DIR --arch=ae --z_num=16 --max_epoch=20 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128 --filter=64
 
 REM 3. train NN
 REM python main.py --arch=nn --code_path=AE_MODEL_DIR --w_size=30 --z_num=16 --filters=512 --max_epoch=200 --batch_size=1024 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128
