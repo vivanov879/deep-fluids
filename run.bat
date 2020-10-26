@@ -65,7 +65,7 @@ REM 4. predict latent code set using trained NN
 REM python main.py --is_train=False --load_path=NN_MODEL_DIR --arch=nn --code_path=AE_MODEL_DIR --w_size=30 --z_num=16 --filters=512 --max_epoch=200 --batch_size=1024 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128
 
 REM 5. reconstruct velocity fields from predicted latent code set
-REM python main.py --is_train=False --load_path=AE_MODEL_DIR --code_path=NN_MODEL_DIR --arch=ae --z_num=16 --max_epoch=20 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128
+REM python main.py --is_train=False --load_path=AE_MODEL_DIR --code_path=NN_MODEL_DIR --arch=ae --z_num=16 --max_epoch=20 --is_3d=False --dataset=smoke_mov200_f400 --res_x=96 --res_y=128 --filter=64
 
 
 REM ----- smoke3_mov, 3D
