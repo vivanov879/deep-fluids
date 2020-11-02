@@ -1,6 +1,9 @@
 import argparse
+import shutil
 from datetime import datetime
 import os
+from pathlib import Path
+
 from tqdm import trange
 import numpy as np
 from PIL import Image
@@ -47,6 +50,13 @@ parser.add_argument("--clamp_mode", type=int, default=2)
 args = parser.parse_args()
 
 def advect():
+
+    output_directory = Path("out")
+    if output_directory.exists():
+        shutil.rmtree(output_directory)
+
+    output_directory.mkdir()
+
     # def get_param(p1, p2):
     #     min_p1 = args.min_inflow
     #     max_p1 = args.max_inflow
@@ -58,12 +68,16 @@ def advect():
     #     p2_ = p2/(num_p2-1) * (max_p2-min_p2) + min_p2
     #     return p1_, p2_
 
-    p1, p2 = 2, 1
+    p1, p2 = 0, 0
     # p1_, p2_ = get_param(p1, p2)
     v_path = os.path.join(args.log_dir, 'v')
     img_dir = os.path.join(args.log_dir, 'd_adv')
+    vdb_dir = os.path.join(args.log_dir, 'd_vdb')
     if not os.path.exists(img_dir):
         os.makedirs(img_dir)
+
+    if not os.path.exists(vdb_dir):
+        os.makedirs(vdb_dir)
 
     # solver params
     res_x = args.resolution_x
@@ -117,18 +131,24 @@ def advect():
                             openBounds=True, boundaryWidth=args.bWidth, clampMode=args.clamp_mode)
         copyGridToArrayReal(density, d_)
 
+        # save as png file
         d_file_path = os.path.join(img_dir, '%04d.png' % t)
         d_img = np.mean(d_[:,::-1], axis=0)*255 # yx
         d_img = np.stack((d_img,d_img,d_img), axis=-1).astype(np.uint8)
         d_img = Image.fromarray(d_img)
         d_img.save(d_file_path)
+
+        # save as vdb file
+        vdb_file_path = os.path.join(vdb_dir, f'{t:04}.vdb')
+        density.save(vdb_file_path)
+
         s.step()
 
 def main():
     if not os.path.exists(args.log_dir):
         os.makedirs(args.log_dir)
 
-    field_type = ['v'] #, 'd']
+    field_type = ['v'] #, 'vdb'] #, 'd']
     for field in field_type:
         field_path = os.path.join(args.log_dir,field)
         if not os.path.exists(field_path):
@@ -141,7 +161,7 @@ def main():
             print('  %s: %s' % (k, v))
             f.write('%s: %s\n' % (k, v))
 
-    p1_space = np.linspace(args.min_inflow, 
+    p1_space = np.linspace(args.min_inflow,
                             args.max_inflow,
                             args.num_inflow)
     p2_space = np.linspace(args.min_buoyancy,
@@ -157,12 +177,12 @@ def main():
     res_z = args.resolution_z
 
     v_ = np.zeros([res_z,res_y,res_x,3], dtype=np.float32)
-    # d_ = np.zeros([res_z,res_y,res_x], dtype=np.float32)
+    d_ = np.zeros([res_z,res_y,res_x], dtype=np.float32)
     # p_ = np.zeros([res_z,res_y,res_x], dtype=np.float32)
     # s_ = np.zeros([res_z,res_y,res_x,3], dtype=np.float32)
 
     v_range = [np.finfo(np.float).max, np.finfo(np.float).min]
-    # d_range = [np.finfo(np.float).max, np.finfo(np.float).min] # 0-1
+    d_range = [np.finfo(np.float).max, np.finfo(np.float).min] # 0-1
     # p_range = [np.finfo(np.float).max, np.finfo(np.float).min]
     # s_range = [np.finfo(np.float).max, np.finfo(np.float).min]
 
@@ -217,11 +237,11 @@ def main():
         p0, p1 = p_list[i][0], p_list[i][1]
         inflow = vec3(p0,0,0)
         buoyancy = vec3(0,p1,0)
-        
+
         for t in trange(args.num_frames, desc='sim'):
             densityInflow(flags=flags, density=density, noise=noise, shape=source, scale=1, sigma=0.5)
             source.applyToGrid(grid=vel, value=inflow)
-                
+
             advectSemiLagrange(flags=flags, vel=vel, grid=density, order=args.adv_order,
                                 openBounds=True, boundaryWidth=args.bWidth, clampMode=args.clamp_mode)
             advectSemiLagrange(flags=flags, vel=vel, grid=vel,     order=args.adv_order,
@@ -230,38 +250,38 @@ def main():
             setWallBcs(flags=flags, vel=vel)
             addBuoyancy(density=density, vel=vel, gravity=buoyancy, flags=flags)
             solvePressure(flags=flags, vel=vel, pressure=pressure, cgMaxIterFac=10.0, cgAccuracy=0.0001)
-            
+
             # # get streamfunction
             # curl1(vel, omega)
             # solve_stream_function_pcg(flags, omega, stream)
             # curl2(stream, vel)
 
             copyGridToArrayMAC(vel, v_)
-            # copyGridToArrayReal(density, d_)
+            copyGridToArrayReal(density, d_)
             # copyGridToArrayReal(pressure, p_)
             # copyGridToArrayVec3(stream, s_)
-            
+
             v_range = [np.minimum(v_range[0], v_.min()),
                         np.maximum(v_range[1], v_.max())]
-            # d_range = [np.minimum(d_range[0], d_.min()),
-            # 		   np.maximum(d_range[1], d_.max())]
+            d_range = [np.minimum(d_range[0], d_.min()),
+            		   np.maximum(d_range[1], d_.max())]
             # p_range = [np.minimum(p_range[0], p_.min()),
             # 		   np.maximum(p_range[1], p_.max())]
             # s_range = [np.minimum(s_range[0], s_.min()),
             # 		   np.maximum(s_range[1], s_.max())]
 
-            
+
             param_ = [p0, p1, t]
             pit = tuple(pi_list[i].tolist() + [t])
 
             v_file_path = os.path.join(args.log_dir, 'v', args.path_format % pit)
-            np.savez_compressed(v_file_path, 
+            np.savez_compressed(v_file_path,
                                 x=v_,
                                 y=param_)
 
-            # if 'vdb' in field_type:
-            #     vdb_file_path = os.path.join(args.log_dir, 'vdb', '%d_%d_%d.vdb' % pit)
-            #     density.save(vdb_file_path)
+            if 'vdb' in field_type:
+                vdb_file_path = os.path.join(args.log_dir, 'vdb', '%d_%d_%d.vdb' % pit)
+                density.save(vdb_file_path)
 
             # d_file_path = os.path.join(args.log_dir, 'd', args.path_format % pit)
             # np.savez_compressed(d_file_path, 
