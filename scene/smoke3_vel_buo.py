@@ -51,12 +51,6 @@ args = parser.parse_args()
 
 def advect():
 
-    output_directory = Path("out")
-    if output_directory.exists():
-        shutil.rmtree(output_directory)
-
-    output_directory.mkdir()
-
     # def get_param(p1, p2):
     #     min_p1 = args.min_inflow
     #     max_p1 = args.max_inflow
