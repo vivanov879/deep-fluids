@@ -12,12 +12,13 @@ from ..model.utils import jacobian3
 
 
 class GeneratorModel(BaseLightningModel):
-    def __init__(self):
+    def __init__(self, z_num: int):
         super().__init__()
-        self.fc = Linear(3, 128 * 4 * 8 * 14)
+        self.z_num = z_num
+        self.filters = 64
+        self.fc = Linear(self.z_num, self.filters * 6 * 9 * 6)
         self.repeat_num = 4
         self.num_conv = 4
-        self.filters = 128
         self.convs = ModuleList()
         for _ in range(self.repeat_num):
             for _ in range(self.num_conv):
@@ -27,9 +28,9 @@ class GeneratorModel(BaseLightningModel):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
 
-        x = x.reshape(-1, 3)
+        x = x.reshape(-1, self.z_num)
         x = self.fc(x)
-        x = x.reshape(-1, 128, 4, 8, 14)
+        x = x.reshape(-1, self.filters, 6, 9, 6)
         x0 = x
 
         for idx in range(self.repeat_num):
@@ -62,10 +63,10 @@ class GeneratorModel(BaseLightningModel):
         G_jaco_, G_vort_ = jacobian3(G_)
         x_jaco, x_vort = jacobian3(x)
 
-        _logger.info(f"{G_.shape=}")
-        _logger.info(f"{x.shape=}")
-        _logger.info(f"{G_jaco_.shape=}")
-        _logger.info(f"{x_jaco.shape=}")
+        # _logger.info(f"{G_.shape=}")
+        # _logger.info(f"{x.shape=}")
+        # _logger.info(f"{G_jaco_.shape=}")
+        # _logger.info(f"{x_jaco.shape=}")
         loss = F.l1_loss(G_, x) + F.l1_loss(G_jaco_, x_jaco)
 
         return loss
