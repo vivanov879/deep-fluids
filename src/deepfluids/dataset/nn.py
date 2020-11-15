@@ -16,21 +16,22 @@ class NeuralNetworkDataset(Dataset):
 
         data_fn = str(data_fn)
         self.data = np.load(data_fn)
+        self.num_sims = self.data['s']
         self.data = {
             'x': np.asarray(self.data['x'], np.float32),
             'y': np.asarray(self.data['y'], np.float32),
             'p': np.asarray(self.data['p'], np.float32)
         }
 
-        self.window = 5
-        self.num_sims = self.data['s']
+        self.window = 30
+
         self.seq_len = len(self.data['x']) // self.num_sims
         self.start_idxs = self._build_start_point_index()
 
     def _build_start_point_index(self):
         start_idxs = []
         for i in range(len(self.data['x'])):
-            if i % self.seq_len in list(range(self.seq_len + 1))[-6:]:
+            if i % self.seq_len > self.seq_len - self.window:
                 continue
             start_idxs.append(i)
         return start_idxs

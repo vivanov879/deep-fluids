@@ -14,11 +14,12 @@ from loguru import logger as _logger
 
 
 @click.command()
-@click.option('--nn_inference', is_flag=False, help='Use nn inference')
+@click.option('--nn_inference', is_flag=True, help='Use nn inference')
 def main(nn_inference):
     sim_idx = 0
 
     if nn_inference:
+        _logger.info(f"Using latent code inferenced by nn")
         xs_ps_fn = Path("/Users/vivanov/Projects/deep-fluids/experiments/NN/xs_ps_inference.npz")
         data = np.load(xs_ps_fn)
         data = {

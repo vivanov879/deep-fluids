@@ -12,7 +12,7 @@ from ..dataset.generator import GeneratorDataset
 from ..model.generator import GeneratorModel
 import horovod.torch as hvd
 
-def train(model: pl.LightningModule, dataset: Dataset, experiment: str):
+def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_size: int = 8):
     hvd.init()
     pl.seed_everything(215)
 
@@ -23,8 +23,8 @@ def train(model: pl.LightningModule, dataset: Dataset, experiment: str):
     dataset_train, dataset_val = random_split(dataset,
                                               [int(0.9 * len(dataset)), len(dataset) - int(0.9 * len(dataset))])
 
-    dataloader_train = DataLoader(dataset_train, batch_size=8, pin_memory=True, shuffle=True, num_workers=8)
-    dataloader_val = DataLoader(dataset_val, batch_size=8, pin_memory=True, shuffle=False, num_workers=8)
+    dataloader_train = DataLoader(dataset_train, batch_size=batch_size, pin_memory=True, shuffle=True, num_workers=8)
+    dataloader_val = DataLoader(dataset_val, batch_size=batch_size, pin_memory=True, shuffle=False, num_workers=8)
 
     experiments_path = Path("/Users/vivanov/Projects/deep-fluids/experiments/")
 
@@ -35,7 +35,7 @@ def train(model: pl.LightningModule, dataset: Dataset, experiment: str):
         gpus=1,
         progress_bar_refresh_rate=2,
         default_root_dir=experiments_path / experiment,
-        max_epochs=1000,
+        max_epochs=9999999,
         logger=tb_logger,
         distributed_backend='horovod',
         # replace_sampler_ddp=False,
