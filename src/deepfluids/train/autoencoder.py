@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from .base import train
-from ..dataset.autoencoder import AutoencoderDataset
+from ..dataset.autoencoder.train import AutoencoderDataset
 from ..model.autoencoder import Autoencoder
 
 if __name__ == '__main__':

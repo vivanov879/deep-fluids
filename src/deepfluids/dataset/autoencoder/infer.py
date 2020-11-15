@@ -1,5 +1,5 @@
 """ Autoencoder dataset """
-
+import os
 from pathlib import Path
 from typing import Dict
 
@@ -7,12 +7,14 @@ import numpy as np
 from loguru import logger as _logger
 from torch.utils.data import DataLoader
 
-from .base import BaseDataset
+from ...dataset.base import BaseDataset
 
 
-class AutoencoderDataset(BaseDataset):
-    def __init__(self, data_dir: Path):
+class AutoencoderInferenceDataset(BaseDataset):
+    def __init__(self, data_dir: Path, num_frames: int):
         super().__init__(data_dir)
+        self.num_frames = num_frames
+        self.fns = list(sorted(self.fns, key=self._sortf))
 
     def __getitem__(self, idx: int) -> Dict[str, np.ndarray]:
         fn = self.fns[idx]
@@ -22,10 +24,13 @@ class AutoencoderDataset(BaseDataset):
                 'y': np.asarray(data['y'][:, -1], dtype=np.float32)}
         return data
 
+    def _sortf(self, x):
+        n = os.path.basename(x)[:-4].split('_')
+        return int(n[0]) * self.num_frames + int(n[1])
 
 if __name__ == '__main__':
     data_dir = Path("/Users/vivanov/Projects/deep-fluids/data/smoke3_mov200_f400/v")
-    dataset = AutoencoderDataset(data_dir)
+    dataset = AutoencoderInferenceDataset(data_dir, 200)
     entry = dataset[100]
     _logger.info(f"{entry['x'].shape=}")
     _logger.info(f"{entry['y'].shape=}")

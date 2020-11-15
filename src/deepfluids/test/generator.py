@@ -1,11 +1,12 @@
 """ A script to test a trained Generator model """
 import os
+from pathlib import Path
 
 import numpy as np
 import torch
 from tqdm import tqdm
 
-from src.deepfluids.model.utils import jacobian3
+from ..model.utils import jacobian3
 from ..model.generator import GeneratorModel
 from loguru import logger as _logger
 
@@ -55,8 +56,7 @@ def main():
     G = np.concatenate(G, axis=0)
 
     # save
-    title = '%d_%d' % (p1, p2)
-    out_dir = os.path.join("out/", title)
+    out_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Generator/velocity_field/")
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 

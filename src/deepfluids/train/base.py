@@ -5,14 +5,14 @@ from pathlib import Path
 import pytorch_lightning as pl
 from loguru import logger as _logger
 from pytorch_lightning import loggers as pl_loggers
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, Dataset
 
 from ..dataset.base import BaseDataset
 from ..dataset.generator import GeneratorDataset
 from ..model.generator import GeneratorModel
 import horovod.torch as hvd
 
-def train(model: pl.LightningModule, dataset: BaseDataset, experiment: str):
+def train(model: pl.LightningModule, dataset: Dataset, experiment: str):
     hvd.init()
     pl.seed_everything(215)
 
@@ -26,7 +26,7 @@ def train(model: pl.LightningModule, dataset: BaseDataset, experiment: str):
     dataloader_train = DataLoader(dataset_train, batch_size=8, pin_memory=True, shuffle=True, num_workers=8)
     dataloader_val = DataLoader(dataset_val, batch_size=8, pin_memory=True, shuffle=False, num_workers=8)
 
-    experiments_path = Path("experiments/")
+    experiments_path = Path("/Users/vivanov/Projects/deep-fluids/experiments/")
 
     tb_logger = pl_loggers.TensorBoardLogger(str(experiments_path), name=experiment)
 
