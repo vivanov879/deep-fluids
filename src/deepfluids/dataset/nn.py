@@ -1,6 +1,5 @@
 """ An implementation of a dataset designed for neural network latent code prediction """
 
-
 from pathlib import Path
 from typing import List, Dict
 
@@ -20,7 +19,8 @@ class NeuralNetworkDataset(Dataset):
         self.data = {
             'x': np.asarray(self.data['x'], np.float32),
             'y': np.asarray(self.data['y'], np.float32),
-            'p': np.asarray(self.data['p'], np.float32)
+            'p': np.asarray(self.data['p'], np.float32),
+            'dp': np.asarray(self.data['dp'], np.float32)
         }
 
         self.window = 30
@@ -44,10 +44,12 @@ class NeuralNetworkDataset(Dataset):
         data = {
             'x': np.asarray(self.data['x'][start_idx: start_idx + self.window], dtype=np.float32),
             'y': np.asarray(self.data['y'][start_idx: start_idx + self.window], dtype=np.float32),
-            'p': np.asarray(self.data['p'][start_idx: start_idx + self.window], dtype=np.float32)
+            'p': np.asarray(self.data['p'][start_idx: start_idx + self.window], dtype=np.float32),
+            'dp': np.asarray(self.data['dp'][start_idx: start_idx + self.window], dtype=np.float32),
         }
         data['y'] -= data['x']
         return data
+
 
 if __name__ == '__main__':
     data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.npz")
@@ -63,9 +65,3 @@ if __name__ == '__main__':
         _logger.info(f"{entry['y'].shape=}")
         _logger.info(f"{entry['p'].shape=}")
         break
-
-
-
-
-
-

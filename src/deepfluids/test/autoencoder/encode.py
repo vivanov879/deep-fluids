@@ -28,19 +28,29 @@ def dump_latent_codes():
 
     dx_list = (nx[:, 1:] - nx[:, :-1]).reshape([-1, 1])
     dz_list = (nz[:, 1:] - nz[:, :-1]).reshape([-1, 1])
-    p_list = np.concatenate((dx_list, dz_list), axis=-1)
+    dp_list = np.concatenate((dx_list, dz_list), axis=-1)
+
+
+    x_list = (nx[:, :-1]).reshape([-1, 1])
+    z_list = (nz[:, :-1]).reshape([-1, 1])
+    p_list = np.concatenate((x_list, z_list), axis=-1)
+    assert p_list.shape == dp_list.shape
 
     c_list = []
+    p_num = 2
 
     data_dir = Path("/Users/vivanov/Projects/deep-fluids/data/smoke3_mov200_f400/v")
     dataset = AutoencoderInferenceDataset(data_dir, num_frames)
-    dataloader = DataLoader(dataset, batch_size=5, pin_memory=True, shuffle=False, num_workers=8)
+    dataloader = DataLoader(dataset, batch_size=8, pin_memory=True, shuffle=False, num_workers=8)
+
+    _logger.info(f"{len(dataset)=}")
 
     with torch.no_grad():
-        for batch in tqdm(dataloader):
+        for i, batch in enumerate(tqdm(dataloader)):
             x = batch['x'].cuda()
             c, _ = model(x)
             c = c.cpu().numpy()
+            c = c[:, :-p_num]
             c_list.append(c)
 
     c_list = np.concatenate(c_list)
@@ -55,12 +65,13 @@ def dump_latent_codes():
 
     x_list = np.concatenate(x_list)
     y_list = np.concatenate(y_list)
-    print(x_list.shape, y_list.shape, p_list.shape)
+    _logger.info(f"{x_list.shape=}, {y_list.shape=}, {dp_list.shape=} {p_list.shape=}")
 
     code_path = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/") / "code16.npz"
     np.savez_compressed(code_path,
                         x=x_list,
                         y=y_list,
+                        dp=dp_list,
                         p=p_list,
                         s=num_sims,
                         f=num_frames)

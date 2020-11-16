@@ -20,4 +20,4 @@ if __name__ == '__main__':
     data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.npz")
 
     dataset = NeuralNetworkDataset(data_dir)
-    train(model, dataset, "NN", 10000)
+    train(model, dataset, "NN", 8192)

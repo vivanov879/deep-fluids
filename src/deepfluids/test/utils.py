@@ -11,10 +11,13 @@ def extract_sim_from_code16(sim_idx: int):
     num_sims = data['s']
     data = {'x': np.asarray(data['x'], np.float32),
             'p': np.asarray(data['p'], np.float32),
-            'y': np.asarray(data['y'], np.float32)}
+            'dp': np.asarray(data['dp'], np.float32),
+            'y': np.asarray(data['y'], np.float32)
+            }
 
     num_frames = len(data['x']) // num_sims
     data['x'] = data['x'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
     data['p'] = data['p'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
+    data['dp'] = data['dp'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
 
     return num_sims, num_frames, data

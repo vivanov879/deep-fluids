@@ -36,11 +36,14 @@ def main(nn_inference):
 
     batch_size = 5
     niter = len(data['x']) // batch_size
+    niter += 1
 
     G = []
     with torch.no_grad():
         for b in tqdm(range(niter), desc="Iterating over z"):
             z = data['x'][batch_size * b:batch_size * (b + 1), :]
+            if len(z) == 0:
+                continue
             G_s = model(torch.Tensor(z).cuda())
             _, G_ = jacobian3(G_s)
 
