@@ -17,7 +17,7 @@ import horovod.torch as hvd
 
 if __name__ == '__main__':
     model = NNModel()
-    data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.npz")
+    data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.pickle")
 
     dataset = NeuralNetworkDataset(data_dir)
-    train(model, dataset, "NN", 8192)
+    train(model, dataset, "NN", 1024)

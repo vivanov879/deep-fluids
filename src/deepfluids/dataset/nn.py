@@ -1,58 +1,58 @@
 """ An implementation of a dataset designed for neural network latent code prediction """
 
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, NamedTuple
 
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 from loguru import logger as _logger
 from tqdm import tqdm
+import pickle
+
+
+class StartPoint(NamedTuple):
+    sim_idx: int
+    frame_idx: int
 
 
 class NeuralNetworkDataset(Dataset):
     def __init__(self, data_fn: Path):
         super().__init__()
 
-        data_fn = str(data_fn)
-        self.data = np.load(data_fn)
-        self.num_sims = self.data['s']
-        self.data = {
-            'x': np.asarray(self.data['x'], np.float32),
-            'y': np.asarray(self.data['y'], np.float32),
-            'p': np.asarray(self.data['p'], np.float32),
-            'dp': np.asarray(self.data['dp'], np.float32)
-        }
-
+        self.data = pickle.load(open(data_fn, "rb"))
+        self.num_sims = len(self.data)
         self.window = 30
 
-        self.seq_len = len(self.data['x']) // self.num_sims
-        self.start_idxs = self._build_start_point_index()
+        self.num_frames = len(self.data[0]['x'])
+        self.start_points = self._build_start_point_index()
 
     def _build_start_point_index(self):
-        start_idxs = []
-        for i in range(len(self.data['x'])):
-            if i % self.seq_len > self.seq_len - self.window:
-                continue
-            start_idxs.append(i)
-        return start_idxs
+        start_points = []
+        for sim_idx in range(self.num_sims):
+            for frame_idx in range(self.num_frames - self.window):
+                start_point = StartPoint(sim_idx=sim_idx, frame_idx=frame_idx)
+                start_points.append(start_point)
+        return start_points
 
     def __len__(self):
-        return len(self.start_idxs)
+        return len(self.start_points)
 
     def __getitem__(self, idx: int) -> Dict[str, np.ndarray]:
-        start_idx = self.start_idxs[idx]
+        start_point = self.start_points[idx]
+
+        data = self.data[start_point.sim_idx]
+
         data = {
-            'x': np.asarray(self.data['x'][start_idx: start_idx + self.window], dtype=np.float32),
-            'y': np.asarray(self.data['y'][start_idx: start_idx + self.window], dtype=np.float32),
-            'p': np.asarray(self.data['p'][start_idx: start_idx + self.window], dtype=np.float32),
-            'dp': np.asarray(self.data['dp'][start_idx: start_idx + self.window], dtype=np.float32),
+            key: np.array(value[start_point.frame_idx: start_point.frame_idx + self.window], dtype=np.float32) for
+            key, value in data.items()
         }
+
         data['y'] -= data['x']
         return data
 
 
 if __name__ == '__main__':
-    data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.npz")
+    data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.pickle")
     dataset = NeuralNetworkDataset(data_dir)
     entry = dataset[100]
     _logger.info(f"{entry['x'].shape=}")

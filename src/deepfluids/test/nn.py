@@ -13,7 +13,7 @@ from loguru import logger as _logger
 
 
 def main():
-    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/NN/version_15/checkpoints/epoch=156.ckpt"
+    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/NN/version_0/checkpoints/epoch=96.ckpt"
     model = NNModel.load_from_checkpoint(checkpoint_path=checkpoint_path).cuda()
     model.eval()
 
@@ -43,7 +43,7 @@ def main():
             _logger.info(f"{dx=}")
 
 
-    xs = np.asarray(xs, np.float32)
+    xs = np.array(xs, np.float32)
 
     _logger.info(f"{xs.shape=}")
 

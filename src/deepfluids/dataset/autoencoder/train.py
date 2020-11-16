@@ -18,8 +18,8 @@ class AutoencoderDataset(BaseDataset):
         fn = self.fns[idx]
         fn = str(fn)
         data = np.load(fn)
-        data = {'x': np.asarray(data['x'].transpose(3, 0, 1, 2), dtype=np.float32),  # CDHW
-                'y': np.asarray(data['y'][:, -1], dtype=np.float32)}
+        data = {'x': np.array(data['x'].transpose(3, 0, 1, 2), dtype=np.float32),  # CDHW
+                'y': np.array(data['y'][:, -1], dtype=np.float32)}
         return data
 
 

@@ -23,13 +23,13 @@ def main(nn_inference):
         xs_ps_fn = Path("/Users/vivanov/Projects/deep-fluids/experiments/NN/xs_ps_inference.npz")
         data = np.load(xs_ps_fn)
         data = {
-            'x': np.asarray(data['x'], np.float32)
+            'x': np.array(data['x'], np.float32)
         }
 
     else:
         num_sims, num_frames, data = extract_sim_from_code16(sim_idx)
 
-    checkpoint_path = "/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/version_0/checkpoints/epoch=5.ckpt"
+    checkpoint_path = "/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/version_1/checkpoints/epoch=7.ckpt"
     model = Autoencoder.load_from_checkpoint(z_num=16, checkpoint_path=checkpoint_path).cuda()
     model = model.generator
     model.eval()

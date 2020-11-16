@@ -16,19 +16,27 @@ class NNModel(BaseLightningModel):
         super().__init__()
         self.z_num = 16
         self.p_num = 2
-        self.hidden_size = 512
+        self.hidden_size = 256
         self.window = 30
         self.fc1 = Linear(self.z_num + self.p_num, self.hidden_size)
+        self.bn1 = BatchNorm1d(self.hidden_size)
+        self.do1 = Dropout(0.1)
         self.fc2 = Linear(self.hidden_size, self.hidden_size)
+        self.bn2 = BatchNorm1d(self.hidden_size)
+        self.do2 = Dropout(0.1)
         self.fc3 = Linear(self.hidden_size, self.z_num - self.p_num)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.fc1(x)
-        x = torch.sin(1 + x)
+        x = F.leaky_relu(x)
+        x = self.bn1(x)
+        x = self.do1(x)
         x = self.fc2(x)
-        x = torch.sin(1 + x)
+        x = F.leaky_relu(x)
+        x = self.bn2(x)
+        x = self.do2(x)
         x = self.fc3(x)
-        x = torch.sin(1 + x)
+        x = F.tanh(x)
 
         return x
 
@@ -41,8 +49,7 @@ class NNModel(BaseLightningModel):
             input = torch.cat([x, p, dp], dim=1)
             dx_pred = self(input)
             loss += F.mse_loss(dx_pred, batch['y'][:, i, :])
-            #_logger.info(f"{dx_pred[19]=}")
-            #_logger.info(f"{batch['y'][:, i, :][19]=}")
+
             x += dx_pred
 
         return loss
