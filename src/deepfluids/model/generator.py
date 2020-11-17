@@ -15,8 +15,10 @@ class GeneratorModel(BaseLightningModel):
     def __init__(self, z_num: int):
         super().__init__()
         self.z_num = z_num
+        # self.z_num = 3 for smoke3_vel_buo scene
         self.filters = 64
         self.fc = Linear(self.z_num, self.filters * 6 * 9 * 6)
+        # self.fc = Linear(3, self.filters * 4 * 8 * 14) for smoke3_vel_buo scene
         self.repeat_num = 4
         self.num_conv = 4
         self.convs = ModuleList()
@@ -31,6 +33,7 @@ class GeneratorModel(BaseLightningModel):
         x = x.reshape(-1, self.z_num)
         x = self.fc(x)
         x = x.reshape(-1, self.filters, 6, 9, 6)
+        # x = x.reshape(-1, 128, 4, 8, 14) for smoke3_vel_buo scene
         x0 = x
 
         for idx in range(self.repeat_num):

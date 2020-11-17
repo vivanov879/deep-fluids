@@ -11,8 +11,8 @@ from ..model.generator import GeneratorModel
 from loguru import logger as _logger
 
 def main():
-    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/Generator/version_0/checkpoints/epoch=32.ckpt"
-    model = GeneratorModel.load_from_checkpoint(checkpoint_path=checkpoint_path).cuda()
+    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/Generator/version_0/checkpoints/epoch=42.ckpt"
+    model = GeneratorModel.load_from_checkpoint(z_num=16, checkpoint_path=checkpoint_path).cuda()
     model.eval()
 
     p1, p2 = 10, 2
