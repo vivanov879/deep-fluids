@@ -20,4 +20,4 @@ if __name__ == '__main__':
     data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.pickle")
 
     dataset = NeuralNetworkDataset(data_dir)
-    train(model, dataset, "NN", 1024)
+    train(model, dataset, "NN", 1024, first_ten_percent_val=True)

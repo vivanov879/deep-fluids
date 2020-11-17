@@ -1,23 +1,23 @@
 """ Utils for testing trained models """
+import pickle
 from pathlib import Path
 
 import numpy as np
 
 
 def extract_sim_from_code16(sim_idx: int):
-    data_dir = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.npz")
+    data_fn = Path("/Users/vivanov/Projects/deep-fluids/experiments/Autoencoder/code16.pickle")
 
-    data = np.load(data_dir)
-    num_sims = data['s']
-    data = {'x': np.array(data['x'], np.float32),
-            'p': np.array(data['p'], np.float32),
-            'dp': np.array(data['dp'], np.float32),
-            'y': np.array(data['y'], np.float32)
-            }
+    data = pickle.load(open(data_fn, "rb"))
 
-    num_frames = len(data['x']) // num_sims
-    data['x'] = data['x'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
-    data['p'] = data['p'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
-    data['dp'] = data['dp'][sim_idx * num_frames: (sim_idx + 1) * num_frames]
+    num_sims = len(data)
+    num_frames = len(data[0]['x'])
+
+    data = data[sim_idx]
+
+    data = {
+        key: np.array(value, dtype=np.float32) for key, value in data.items()
+    }
+    data['y'] -= data['x']
 
     return num_sims, num_frames, data

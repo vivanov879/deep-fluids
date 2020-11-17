@@ -11,8 +11,7 @@ import pickle
 from src.deepfluids.dataset.autoencoder.infer import AutoencoderInferenceDataset
 from src.deepfluids.model.autoencoder import Autoencoder
 
-
-def dump_latent_codes():
+def main():
     checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/Autoencoder/version_1/checkpoints/epoch=7.ckpt"
     model = Autoencoder.load_from_checkpoint(z_num=16, checkpoint_path=checkpoint_path).cuda()
     model.eval()
@@ -73,4 +72,4 @@ def dump_latent_codes():
 
 
 if __name__ == '__main__':
-    dump_latent_codes()
+    main()

@@ -5,14 +5,16 @@ from pathlib import Path
 import pytorch_lightning as pl
 from loguru import logger as _logger
 from pytorch_lightning import loggers as pl_loggers
-from torch.utils.data import DataLoader, random_split, Dataset
+from torch.utils.data import DataLoader, random_split, Dataset, Subset
 
 from ..dataset.base import BaseDataset
 from ..dataset.generator import GeneratorDataset
 from ..model.generator import GeneratorModel
 import horovod.torch as hvd
 
-def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_size: int = 8):
+
+def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_size: int = 8,
+          first_ten_percent_val=False):
     hvd.init()
     pl.seed_everything(215)
 
@@ -20,9 +22,14 @@ def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_si
 
     _logger.info(f"Initializing dataset")
 
-    dataset_train, dataset_val = random_split(dataset,
-                                              [int(0.9 * len(dataset)), len(dataset) - int(0.9 * len(dataset))])
+    train_size = int(0.9 * len(dataset))
+    val_size = len(dataset) - int(0.9 * len(dataset))
 
+    if first_ten_percent_val:
+        dataset_val = Subset(dataset, range(val_size))
+        dataset_train = Subset(dataset, range(val_size, train_size))
+    else:
+        dataset_train, dataset_val = random_split(dataset, [train_size, val_size])
     dataloader_train = DataLoader(dataset_train, batch_size=batch_size, pin_memory=True, shuffle=True, num_workers=8)
     dataloader_val = DataLoader(dataset_val, batch_size=batch_size, pin_memory=True, shuffle=False, num_workers=8)
 
@@ -42,4 +49,3 @@ def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_si
     )
 
     trainer.fit(model, dataloader_train, dataloader_val)
-

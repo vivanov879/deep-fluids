@@ -13,7 +13,7 @@ from loguru import logger as _logger
 
 
 def main():
-    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/NN/version_0/checkpoints/epoch=96.ckpt"
+    checkpoint_path = "/home/vivanov/Projects/deep-fluids/experiments/NN/version_6/checkpoints/epoch=177.ckpt"
     model = NNModel.load_from_checkpoint(checkpoint_path=checkpoint_path).cuda()
     model.eval()
 
@@ -21,17 +21,16 @@ def main():
     sim_idx = 0
     num_sims, num_frames, data = extract_sim_from_code16(sim_idx)
 
-    x = data['x'][0]
-    x = x[None, ...]
+    _logger.info(f"{data['x'].shape=}, {num_frames=}")
+
+    x = data['x'][[0]]
     xs = []
 
     with torch.no_grad():
         for i in tqdm(range(num_frames)):
-            dp = data['dp'][i]
-            dp = dp[None, ...]
+            dp = data['dp'][[i]]
 
-            p = data['dp'][i]
-            p = p[None, ...]
+            p = data['dp'][[i]]
 
             xs.append(np.concatenate([x, p], 1))
             input = np.concatenate([x, p, dp], 1)
