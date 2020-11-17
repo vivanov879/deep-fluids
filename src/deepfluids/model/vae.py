@@ -16,6 +16,11 @@ from ..model.utils import jacobian3
 
 class VAE(BaseLightningModel):
     def __init__(self, z_num: int):
+        """
+        A Variational encoder model implementation
+        Args:
+            z_num: latent code dimension
+        """
         super().__init__()
         self.encoder = EncoderModel(32)
         self.generator = GeneratorModel(z_num)
@@ -34,20 +39,21 @@ class VAE(BaseLightningModel):
         return z, x, KLD
 
     def _reparameterize(self, mu, logvar):
+        """
+        A method that carries out reparametrization trick
+        Args:
+            mu: mean
+            logvar: log variance
+
+        Returns:
+            latent code
+
+        """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
 
     def _train_valid_helper(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
-        """A helper function that extracts samples from a batch of data, runs a forward step and calculates loss
-
-        Args:
-          batch: input batch
-
-        Returns:
-          a tuple of ground truth masks, prediction, a loss value, and f1 score
-
-        """
         x = batch['x']
         y = batch['y']
 
@@ -57,12 +63,6 @@ class VAE(BaseLightningModel):
         _, G_ = jacobian3(G_s)
         G_jaco_, G_vort_ = jacobian3(G_)
         x_jaco, x_vort = jacobian3(x)
-
-        # _logger.info(f"{G_.shape=}")
-        # _logger.info(f"{x.shape=}")
-        # _logger.info(f"{G_jaco_.shape=}")
-        # _logger.info(f"{x_jaco.shape=}")
-        # _logger.info(f"{z[:, -p_num:].shape=}, {y.shape=}")
 
         loss = KLD + F.l1_loss(G_, x) + F.l1_loss(G_jaco_, x_jaco) + F.mse_loss(z[:, -p_num:], y)
 

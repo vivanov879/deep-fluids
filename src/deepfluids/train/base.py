@@ -15,6 +15,18 @@ import horovod.torch as hvd
 
 def train(model: pl.LightningModule, dataset: Dataset, experiment: str, batch_size: int = 8,
           first_ten_percent_val=False):
+    """
+    A method that trains a model
+    Args:
+        model: model to train
+        dataset: dataset for training
+        experiment: experiment name
+        batch_size: batch size
+        first_ten_percent_val: a flag indicating that first portion of a dataset is to be set aside as validation
+
+    Returns:
+
+    """
     hvd.init()
     pl.seed_everything(215)
 

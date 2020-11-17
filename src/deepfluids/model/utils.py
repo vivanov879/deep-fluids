@@ -4,6 +4,15 @@ from typing import Tuple
 import torch
 
 def jacobian3(x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    A function that computes a jacobian in 3d for a velocity field
+    Args:
+        x: velocity field
+
+    Returns:
+        jacobian
+
+    """
 
     # x: bdzyx -> bzyxd
     x = x.permute(0,2,3,4,1)

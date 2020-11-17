@@ -8,6 +8,9 @@ import torch
 
 class BaseLightningModel(pl.LightningModule):
     def __init__(self):
+        """
+        Base class for models
+        """
         super().__init__()
 
     def _train_valid_helper(self, batch: Dict[str, torch.Tensor]):
@@ -31,12 +34,13 @@ class BaseLightningModel(pl.LightningModule):
         self.log_dict({"loss/val": avg_loss})
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
-        """A method that returns an optimizer used for training.
+        """
+        Configures an optimzer
 
         Args:
 
         Returns:
-            torch optimizer
+            a torch optimizer
 
         """
         return torch.optim.Adam(self.parameters(), lr=1e-4)

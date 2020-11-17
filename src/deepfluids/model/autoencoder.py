@@ -1,6 +1,5 @@
 """ An implementation of Autoencoder model """
 
-
 from typing import Dict, List, Tuple
 
 import torch
@@ -14,14 +13,19 @@ from .encoder import EncoderModel
 from .generator import GeneratorModel
 from ..model.utils import jacobian3
 
+
 class Autoencoder(BaseLightningModel):
     def __init__(self, z_num: int):
+        """
+        Autoencoder model
+        Args:
+            z_num: latent code dimension
+        """
         super().__init__()
         self.encoder = EncoderModel(z_num)
         self.generator = GeneratorModel(z_num)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-
         z = self.encoder(x)
         x = self.generator(z)
 
@@ -34,7 +38,7 @@ class Autoencoder(BaseLightningModel):
           batch: input batch
 
         Returns:
-          a tuple of ground truth masks, prediction, a loss value, and f1 score
+            loss
 
         """
         x = batch['x']
@@ -47,13 +51,6 @@ class Autoencoder(BaseLightningModel):
         G_jaco_, G_vort_ = jacobian3(G_)
         x_jaco, x_vort = jacobian3(x)
 
-        # _logger.info(f"{G_.shape=}")
-        # _logger.info(f"{x.shape=}")
-        # _logger.info(f"{G_jaco_.shape=}")
-        # _logger.info(f"{x_jaco.shape=}")
-        # _logger.info(f"{z[:, -p_num:].shape=}, {y.shape=}")
         loss = F.l1_loss(G_, x) + F.l1_loss(G_jaco_, x_jaco) + F.mse_loss(z[:, -p_num:], y)
 
         return loss
-
-

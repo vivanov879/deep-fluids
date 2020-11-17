@@ -41,7 +41,6 @@ def main():
             x += dx
             _logger.info(f"{dx=}")
 
-
     xs = np.array(xs, np.float32)
 
     _logger.info(f"{xs.shape=}")

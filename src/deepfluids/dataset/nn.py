@@ -11,6 +11,9 @@ import pickle
 
 
 class StartPoint(NamedTuple):
+    """
+    Stores the information on the sequence start
+    """
     sim_idx: int
     frame_idx: int
 

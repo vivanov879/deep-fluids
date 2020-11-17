@@ -11,6 +11,11 @@ from .utils import find_npz_files
 
 class BaseDataset(Dataset):
     def __init__(self, data_dir: Path):
+        """
+        A base class for datasets
+        Args:
+            data_dir: data directory
+        """
         super().__init__()
         self.fns = find_npz_files(data_dir)
 
