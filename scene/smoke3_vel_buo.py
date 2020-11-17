@@ -115,7 +115,8 @@ def advect():
 
     d_ = np.zeros([res_z, res_y, res_x], dtype=np.float32)
     for t in trange(args.num_frames):
-        v_path_ = os.path.join(v_path, args.path_format % (p1, p2, t))
+        v_path_ = f"/home/vivanov/Projects/deep-fluids/out/10_2/{t}.npz"
+
         with np.load(v_path_) as data:
             v = data['x']
 
@@ -323,7 +324,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    #main()
 
     # advection test
     advect()
