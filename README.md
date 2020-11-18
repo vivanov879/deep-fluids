@@ -5,7 +5,7 @@ This is a pytorch implementation of Deep Fluids paper. The original tensorflow i
  https://github.com/byungsook/deep-fluids. The torch sources are located at `src/`. The sources
 of the original tensorflow implementation are kept where they were. This is the video playlist 
 https://www.youtube.com/watch?v=nryZ-cqfs5E&list=PLX7INEUkOHp8TY3_uuC9EPbDhSbKJNfFt of the results
-obtained with the library 
+obtained with the library. The paper `PyTorch implementation of Deep Fluids.pdf` describes the experiments in detail. 
 
 ## Install prerequisites
 First, create a conda environment for tensorflow, and install the original tensorflow paper requirements by following instructions from `README_tensorflow.md`. Manta package has to be compiled with 
