@@ -1,0 +1,36 @@
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--log_dir", type=str, default='data/smoke3_vel5_buo3_f250')
+parser.add_argument("--num_param", type=int, default=3)
+parser.add_argument("--path_format", type=str, default='%d_%d_%d.npz')
+parser.add_argument("--p0", type=str, default='inflow')
+parser.add_argument("--p1", type=str, default='buoyancy')
+parser.add_argument("--p2", type=str, default='frames')
+
+parser.add_argument("--min_inflow", type=float, default=1)
+parser.add_argument("--max_inflow", type=float, default=5)
+parser.add_argument("--num_inflow", type=int, default=5)
+parser.add_argument("--min_buoyancy", type=float, default=-2e-4)
+parser.add_argument("--max_buoyancy", type=float, default=-10e-4)
+parser.add_argument("--num_buoyancy", type=int, default=3)
+parser.add_argument("--src_x_pos", type=float, default=0.1)
+parser.add_argument("--src_y_pos", type=float, default=0.25)
+parser.add_argument("--src_z_pos", type=float, default=0.5)
+parser.add_argument("--src_radius", type=float, default=0.14)
+parser.add_argument("--src_height", type=float, default=0.04)
+parser.add_argument("--min_frames", type=int, default=0)
+parser.add_argument("--max_frames", type=int, default=249)
+parser.add_argument("--num_frames", type=int, default=250)
+parser.add_argument("--num_simulations", type=int, default=3750) # 5*3*250
+
+parser.add_argument("--resolution_x", type=int, default=112)
+parser.add_argument("--resolution_y", type=int, default=64)
+parser.add_argument("--resolution_z", type=int, default=32)
+parser.add_argument("--bWidth", type=int, default=1)
+parser.add_argument("--open_bound", type=str, default='XyY')
+parser.add_argument("--time_step", type=float, default=0.5)
+parser.add_argument("--adv_order", type=int, default=2)
+parser.add_argument("--clamp_mode", type=int, default=2)
+
+args = parser.parse_args()

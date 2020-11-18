@@ -37,9 +37,9 @@ net_arg.add_argument('--w_size', type=int, default=5)
 # Data
 data_arg = add_argument_group('Data')
 data_arg.add_argument('--dataset', type=str, default='smoke_pos21_size5_f200')
-data_arg.add_argument('--batch_size', type=int, default=8)
+data_arg.add_argument('--batch_size', type=int, default=64)
 data_arg.add_argument('--test_batch_size', type=int, default=100)
-data_arg.add_argument('--num_worker', type=int, default=2)
+data_arg.add_argument('--num_worker', type=int, default=8)
 data_arg.add_argument('--data_type', type=str, default='velocity')
 
 # Training / test parameters
